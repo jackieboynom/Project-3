@@ -1,5 +1,5 @@
 // Members: Helee Thumber (hat170030), Tanushri Singh (tts150030), Ko-Chen (Jack) Chen (kxc170002)
-// Project 2
+// Project 3
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,7 +11,7 @@ public class Main {
         System.out.println();
         //parse config file
         String PATH = System.getProperty("user.dir");
-        PATH = PATH + "/CS6378/Project-2/src/config_file.txt";
+        PATH = PATH + "/CS6378/Project-3/src/config_file.txt";
         Nodes[] array_of_nodes = Parser.parse(PATH);
 
         //start server with array_of_nodes[args[0]], args[0] is passed in through launcher.sh
