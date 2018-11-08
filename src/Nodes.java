@@ -1,11 +1,16 @@
 import java.util.ArrayList;
 
 public class Nodes {
+    private int nodeId;
     private String hostName;
     private int portNumber;
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
     private ArrayList<Integer> treeNeighbours = new ArrayList<Integer>();
+
+    public void setNodeId(int id) {
+        this.nodeId = id;
+    }
 
     public void setHostName(String i) {
         this.hostName = i;
@@ -25,6 +30,10 @@ public class Nodes {
 
     public void addTreeNeighbours(int num) {
         this.treeNeighbours.add(num);
+    }
+
+    public int getNodeId() {
+        return this.nodeId;
     }
 
     public String getHostName() {

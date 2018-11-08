@@ -146,7 +146,7 @@ public class Server extends Thread {
         }
 
         //broadcast to every node
-        int messagesToSend = 5;
+        /*int messagesToSend = 5;
         try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
@@ -216,6 +216,6 @@ public class Server extends Thread {
 
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

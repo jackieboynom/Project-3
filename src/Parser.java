@@ -4,13 +4,16 @@ public class Parser {
     public static Nodes[] parse (String PATH) {
         File file = new File(PATH);
         BufferedReader bufferedReader = null;
-        int numNode = 0;
+        int n = 0; //numNodes
+        int d = 0; //inter-request delay
+        int c = 0; //cs-execution time
+        int numOfRequest = 0;
         boolean found = false;
         String line;
         int index;
         boolean empty;
 
-        //read numNode
+        //read numNode n, inter-request delay d, cs-execution time c, #ofrequest
         try {
             //open file
             FileReader fileReader = new FileReader(file);
@@ -32,7 +35,16 @@ public class Parser {
                 //create nodes
                 if (!empty) {
                     //parse info
-                    numNode = Integer.parseInt(line);
+                    index = line.indexOf(" ");
+                    n = Integer.parseInt(line.substring(0, index));
+                    line = line.substring(index).trim();
+                    index = line.indexOf(" ");
+                    d = Integer.parseInt(line.substring(0, index));
+                    line = line.substring(index).trim();
+                    index = line.indexOf(" ");
+                    c = Integer.parseInt(line.substring(0, index));
+                    line = line.substring(index).trim();
+                    numOfRequest = Integer.parseInt(line);
                     found = true;
                 }
             }
@@ -41,10 +53,10 @@ public class Parser {
         }
 
         //populate node information
-        Nodes[] array_of_nodes = new Nodes[numNode + 1];
+        Nodes[] array_of_nodes = new Nodes[n];
         try {
-            int valid_lines = 1;
-            while (valid_lines != numNode + 1) {
+            int valid_lines = 0;
+            while (valid_lines != n) {
                 line = bufferedReader.readLine();
                 empty = false;
                 //format line to just have what we want
@@ -61,19 +73,15 @@ public class Parser {
                     //parse info
                     Nodes node = new Nodes();
                     index = line.indexOf(" ");
-                    node.setHostName(line.substring(0, index) + ".utdallas.edu");
+                    node.setNodeId(Integer.parseInt(line.substring(0, index)));
                     line = line.substring(index).trim();
                     index = line.indexOf(" ");
-                    node.setPortNumber(Integer.parseInt(line.substring(0, index)));
+                    node.setHostName(line.substring(0, index) + ".utdallas.edu");
                     line = line.substring(index).trim();
-                    while (line != null) {
-                        if (line.contains(" ")) {
-                            index = line.indexOf(" ");
-                            node.addNodalConnections(Integer.parseInt(line.substring(0, index)));
-                            line = line.substring(index + 1);
-                        } else {
-                            node.addNodalConnections(Integer.parseInt(line));
-                            line = null;
+                    node.setPortNumber(Integer.parseInt(line));
+                    for (int i = 0; i < n; i++){
+                        if (i != node.getNodeId()) {
+                            node.addNodalConnections(i);
                         }
                     }
                     array_of_nodes[valid_lines] = node;
