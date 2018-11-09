@@ -3,7 +3,7 @@ public class Services {
 
 	}
 
-	public void exit_cs() {
+	public void leave_cs() {
 		
 	}
 }

@@ -7,6 +7,8 @@ public class Nodes {
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
     private ArrayList<Integer> treeNeighbours = new ArrayList<Integer>();
+    private int interRequestDelay;
+    private int csExecutionTime;
 
     public void setNodeId(int id) {
         this.nodeId = id;
@@ -55,4 +57,8 @@ public class Nodes {
     public ArrayList<Integer> getTreeNeighbours() {
         return this.treeNeighbours;
     }
+
+    public int getInterRequestDelay() { return this.interRequestDelay; }
+
+    public int getCsExecutionTime() { return this.csExecutionTime; }
 }
