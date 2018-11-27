@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Nodes {
     private int nodeId;
@@ -7,6 +8,7 @@ public class Nodes {
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
     private ArrayList<Integer> treeNeighbours = new ArrayList<Integer>();
+    private HashMap<Integer, Boolean> keys = new HashMap<>();
 
     public void setNodeId(int id) {
         this.nodeId = id;
@@ -32,6 +34,18 @@ public class Nodes {
         this.treeNeighbours.add(num);
     }
 
+    public void addKeysTrue(int num) {
+        this.keys.put(num, true);
+    }
+
+    public void addKeysFalse(int num) {
+        this.keys.put(num, false);
+    }
+
+    public void removeKeys(int num) {
+        this.keys.remove(num);
+    }
+
     public int getNodeId() {
         return this.nodeId;
     }
@@ -54,5 +68,9 @@ public class Nodes {
 
     public ArrayList<Integer> getTreeNeighbours() {
         return this.treeNeighbours;
+    }
+
+    public HashMap<Integer, Boolean> getKeys() {
+        return this.keys;
     }
 }
