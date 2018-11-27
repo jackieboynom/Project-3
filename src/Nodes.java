@@ -8,12 +8,9 @@ public class Nodes {
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
     private ArrayList<Integer> treeNeighbours = new ArrayList<Integer>();
-<<<<<<< HEAD
     private HashMap<Integer, Boolean> keys = new HashMap<>();
-=======
     private int interRequestDelay;
     private int csExecutionTime;
->>>>>>> 575e7c5c46c7fccce2fb63d7f04b36cf5df15fb1
 
     public void setNodeId(int id) {
         this.nodeId = id;
@@ -75,13 +72,11 @@ public class Nodes {
         return this.treeNeighbours;
     }
 
-<<<<<<< HEAD
     public HashMap<Integer, Boolean> getKeys() {
         return this.keys;
     }
-=======
+
     public int getInterRequestDelay() { return this.interRequestDelay; }
 
     public int getCsExecutionTime() { return this.csExecutionTime; }
->>>>>>> 575e7c5c46c7fccce2fb63d7f04b36cf5df15fb1
 }
