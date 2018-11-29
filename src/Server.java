@@ -14,6 +14,13 @@ public class Server extends Thread {
     String ackMsg = "ACK";
     String nackMsg = "NACK";
 
+    //initialize socket and input/output stream
+    ServerSocket server = null;
+    Socket inSocket = null;
+    Socket outSocket = null;
+    ObjectInputStream in = null;
+    ObjectOutputStream out = null;
+
     Server (Nodes[] array_of_nodes, int serverNum) {
         this.array_of_nodes = array_of_nodes;
         this.serverNum = serverNum;
@@ -39,13 +46,6 @@ public class Server extends Thread {
     }
 
     public void run() {
-        //initialize socket and input/output stream
-        ServerSocket server = null;
-        Socket inSocket = null;
-        Socket outSocket = null;
-        ObjectInputStream in = null;
-        ObjectOutputStream out = null;
-
         //set up variables
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
@@ -65,6 +65,14 @@ public class Server extends Thread {
                 Packet packet = (Packet) in.readObject();
                 System.out.println("Server: Packet Received - " + packet);
                 in.close();
+
+                //get reqMsg, check if own application is in crit section, if not send key to requestor, if yes, add to queue and wait until cs_leave
+                if (//msg is reqmsg)
+                if (Main.isInCS) {
+                    //then add to queue and wait
+                } else {
+                    //send key back
+                }
 
                 /*//get info out of msg
                 int broadcastSource = packet.getBroadcastNode();
@@ -115,10 +123,13 @@ public class Server extends Thread {
     }
 
     public void getKeys() {
-        Packet m = new Packet();
-        m.buildPacket(serverNum, serverNum, reqMsg);
         //send msg to all servers with false key
-        
+        Nodes node = array_of_nodes[serverNum];
+        for (int i : node.getTreeNeighbours()) {
+            if (node.getKeys().get(i) == false) {
+                sendPacket(outSocket, out, serverNum, serverNum, reqMsg, i);
+            }
+        }
     }
 
     public void addToQueue() {

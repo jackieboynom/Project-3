@@ -7,6 +7,11 @@ import java.util.Objects;
 import java.lang.Integer;
 
 public class Main {
+
+    public static boolean reqCS = false;
+    public static boolean isInCS = false;
+
+
     public static void main(String[] args) {
         System.out.println();
         //parse config file
@@ -22,6 +27,11 @@ public class Main {
 
         //start servers
         Server server = new Server(array_of_nodes, Integer.parseInt(args[0]));
+        try {
+            Thread.sleep(3000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //start the requests
         Main app = new Main();
@@ -37,9 +47,11 @@ public class Main {
     }
 
     public void cs_enter(Server s, int exTime) {
+        reqCS = true;
         System.out.println("Entering CS");
         s.addToQueue();
         if (s.checkForKeys()) {
+            isInCS = true;
             System.out.println("This server has all the keys");
             //log time start
             //wait for exTime
