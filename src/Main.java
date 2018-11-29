@@ -16,20 +16,27 @@ public class Main {
 
 
         //Start building spanning tree and initilize keys
-        SpanningTree tree = new SpanningTree(array_of_nodes, Integer.parseInt(args[0]));
+        SpanningTree tree = null;
+        tree = new SpanningTree(array_of_nodes, Integer.parseInt(args[0]));
+        while(tree == null){
 
+        }
         //start server with array_of_nodes[args[0]], args[0] is passed in through launcher.sh
-        //Server server = new Server(array_of_nodes, Integer.parseInt(args[0]));
+        Server server = new Server(array_of_nodes, Integer.parseInt(args[0]));
 
         //start the requests
+        Main app = new Main();
+        app.start_app(server);
+    }
+
+    public Main() {
+
+    }
+    public void start_app(Server server) {
         cs_enter(server);
     }
 
-    public void start_app() {
-        cs_enter(server)
-    }
-
-    public static void cs_enter(Server s) {
+    public void cs_enter(Server s) {
 
     }
 
