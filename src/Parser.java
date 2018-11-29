@@ -1,12 +1,14 @@
 import java.io.*;
 
 public class Parser {
+    static int n = 0; //numNodes
+    static int d = 0; //inter-request delay
+    static int c = 0; //cs-execution time
+    static Nodes[] array_of_nodes;
+
     public static Nodes[] parse (String PATH) {
         File file = new File(PATH);
         BufferedReader bufferedReader = null;
-        int n = 0; //numNodes
-        int d = 0; //inter-request delay
-        int c = 0; //cs-execution time
         int numOfRequest = 0;
         boolean found = false;
         String line;
@@ -53,7 +55,7 @@ public class Parser {
         }
 
         //populate node information
-        Nodes[] array_of_nodes = new Nodes[n];
+        array_of_nodes = new Nodes[n];
         try {
             int valid_lines = 0;
             while (valid_lines != n) {
@@ -92,5 +94,13 @@ public class Parser {
             e.printStackTrace();
         }
         return array_of_nodes;
+    }
+
+    public static int getD() {
+        return d;
+    }
+
+    public static int getC() {
+        return c;
     }
 }

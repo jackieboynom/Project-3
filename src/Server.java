@@ -9,6 +9,11 @@ public class Server extends Thread {
     private int serverNum;
     private ArrayList<Packet> queue;
 
+    //Set up messages
+    String reqMsg = "REQ"; //requesting cs section
+    String ackMsg = "ACK";
+    String nackMsg = "NACK";
+
     Server (Nodes[] array_of_nodes, int serverNum) {
         this.array_of_nodes = array_of_nodes;
         this.serverNum = serverNum;
@@ -41,11 +46,6 @@ public class Server extends Thread {
         ObjectInputStream in = null;
         ObjectOutputStream out = null;
 
-        //Set up messages
-        String reqMsg = "REQ";
-        String ackMsg = "ACK";
-        String nackMsg = "NACK";
-
         //set up variables
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
@@ -53,42 +53,20 @@ public class Server extends Thread {
         //broadcast to every node
         int messagesToSend = 5;
         try {
+            boolean finished = false;
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
-            /*Thread.sleep(8000);
-            boolean finished = false;
-            int counter = 1;
 
             do {
-                Packet packet;
-                //sends messagesToSend messages
-                if (records[serverNum][1] == 0 && messagesToSend >= 0) {
-                    if (records[serverNum][1] == 0 && messagesToSend != 100){
-                        System.out.println();
-                        System.out.println("SOURCE HAS RECEIVED " + counter + " ACKNOWLEDGMENTS THAT ITS MESSAGE HAS BEEN BROADCASTED!");
-                        counter++;
-                        System.out.println();
-                    }
-                    if (messagesToSend != 0) {
-                        //sends to all tree neighbours
-                        for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                            int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                            sendPacket(outSocket, out, serverNum, serverNum, "Hello", dest);
-                            records[serverNum][1] += 1;
-                        }
-                    }
-                    messagesToSend--;
-                }
-
                 System.out.println("Server: Waiting for a messages ...");
                 inSocket = server.accept();
                 System.out.println("Server: Packet received!");
                 in = new ObjectInputStream(inSocket.getInputStream());
-                packet = (Packet) in.readObject();
+                Packet packet = (Packet) in.readObject();
                 System.out.println("Server: Packet Received - " + packet);
                 in.close();
 
-                //get info out of msg
+                /*//get info out of msg
                 int broadcastSource = packet.getBroadcastNode();
                 int source = packet.getSourceId();
                 String msg = packet.getMsg();
@@ -116,11 +94,40 @@ public class Server extends Thread {
                         sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
                         System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
                     }
-                }
-            } while (!finished);*/
+                }*/
+            } while (!finished);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public synchronized boolean checkForKeys() {
+        Nodes node = array_of_nodes[serverNum];
+        synchronized (node) {
+            for (int i : node.getTreeNeighbours()) {
+                if (node.getKeys().get(i) == false) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public void getKeys() {
+        Packet m = new Packet();
+        m.buildPacket(serverNum, serverNum, reqMsg);
+        //send msg to all servers with false key
+        
+    }
+
+    public void addToQueue() {
+        Packet m = new Packet();
+        m.buildPacket(serverNum, serverNum, reqMsg);
+        queue.add(m);
+    }
+
+    public void removeFromQueue() {
+
     }
 }

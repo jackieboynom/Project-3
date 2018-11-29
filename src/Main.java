@@ -13,34 +13,62 @@ public class Main {
         String PATH = System.getProperty("user.dir");
         PATH = PATH + "/CS6378/Project-3/src/config_file.txt";
         Nodes[] array_of_nodes = Parser.parse(PATH);
-
+        int delay = Parser.getD();
+        int exTime = Parser.getC();
 
         //Start building spanning tree and initilize keys
-        SpanningTree tree = null;
-        tree = new SpanningTree(array_of_nodes, Integer.parseInt(args[0]));
-        while(tree == null){
+        SpanningTree tree = new SpanningTree(array_of_nodes, Integer.parseInt(args[0]));
+        while(Thread.activeCount() > 1){ } //just waiting for spanning tree to finish
 
-        }
-        //start server with array_of_nodes[args[0]], args[0] is passed in through launcher.sh
+        //start servers
         Server server = new Server(array_of_nodes, Integer.parseInt(args[0]));
 
         //start the requests
         Main app = new Main();
-        app.start_app(server);
+        app.start_app(server, delay, exTime);
     }
 
     public Main() {
 
     }
-    public void start_app(Server server) {
-        cs_enter(server);
+
+    public void start_app(Server server, int delay, int exTime) {
+        cs_enter(server, delay);
     }
 
-    public void cs_enter(Server s) {
-
+    public void cs_enter(Server s, int exTime) {
+        System.out.println("Entering CS");
+        s.addToQueue();
+        if (s.checkForKeys()) {
+            System.out.println("This server has all the keys");
+            //log time start
+            //wait for exTime
+            try {
+                Thread.sleep(exTime);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            s.getKeys();
+        }
+        while (!s.checkForKeys()) {
+            //waiting
+        }
+        //do same stuff in the first if loop
+        System.out.println("This server has all the keys");
+        try {
+            Thread.sleep(exTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void cs_leave() {
-
+    public void cs_leave(Server s, int delay) {
+        s.removeFromQueue();
+        try {
+            Thread.sleep(delay);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
