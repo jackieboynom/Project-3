@@ -144,17 +144,5 @@ public class SpanningTree extends Thread {
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        //initilizate keys
-        for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-            if (array_of_nodes[serverNum].getTreeNeighbours().get(i) > serverNum) {
-                array_of_nodes[serverNum].addKeys(array_of_nodes[serverNum].getTreeNeighbours().get(i), true);
-            } else {
-                array_of_nodes[serverNum].addKeys(array_of_nodes[serverNum].getTreeNeighbours().get(i), false);
-            }
-        }
-        //printing keys
-        System.out.println(array_of_nodes[serverNum].getKeys());
-        System.out.println("--------------------------KEYS DONE-----------------------------------");
     }
 }
