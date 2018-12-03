@@ -4,12 +4,12 @@ public class Parser {
     static int n = 0; //numNodes
     static int d = 0; //inter-request delay
     static int c = 0; //cs-execution time
+    static int numOfRequest = 0;
     static Nodes[] array_of_nodes;
 
     public static Nodes[] parse (String PATH) {
         File file = new File(PATH);
         BufferedReader bufferedReader = null;
-        int numOfRequest = 0;
         boolean found = false;
         String line;
         int index;
@@ -102,5 +102,9 @@ public class Parser {
 
     public static int getC() {
         return c;
+    }
+
+    public static int getNumOfRequest() {
+        return numOfRequest;
     }
 }

@@ -148,9 +148,9 @@ public class SpanningTree extends Thread {
         //initilizate keys
         for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
             if (array_of_nodes[serverNum].getTreeNeighbours().get(i) > serverNum) {
-                array_of_nodes[serverNum].addKeysTrue(array_of_nodes[serverNum].getTreeNeighbours().get(i));
+                array_of_nodes[serverNum].addKeys(array_of_nodes[serverNum].getTreeNeighbours().get(i), true);
             } else {
-                array_of_nodes[serverNum].addKeysFalse(array_of_nodes[serverNum].getTreeNeighbours().get(i));
+                array_of_nodes[serverNum].addKeys(array_of_nodes[serverNum].getTreeNeighbours().get(i), false);
             }
         }
         //printing keys

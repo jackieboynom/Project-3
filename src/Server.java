@@ -1,18 +1,19 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.concurrent.*;
+import java.util.Queue;
 
 public class Server extends Thread {
     //set up variables
     private Nodes[] array_of_nodes;
     private int serverNum;
-    private ArrayList<Packet> queue;
+    private Queue<Packet> queue;
+    private Packet myRequest = null;
 
     //Set up messages
     String reqMsg = "REQ"; //requesting cs section
-    String ackMsg = "ACK";
-    String nackMsg = "NACK";
+    String sendKey = "sendKey"; //sending key to each other
 
     //initialize socket and input/output stream
     ServerSocket server = null;
@@ -24,18 +25,18 @@ public class Server extends Thread {
     Server (Nodes[] array_of_nodes, int serverNum) {
         this.array_of_nodes = array_of_nodes;
         this.serverNum = serverNum;
-        this.queue = new ArrayList<>();
+        this.queue = new ConcurrentLinkedQueue<>();
         Thread t = new Thread(this);
         t.start();
     }
 
-    public void sendPacket(Socket outSocket, ObjectOutputStream out, int broadcast, int source, String message, int dest) {
+    public void sendPacket(int source, String message, int dest) {
         try {
             Packet packet = new Packet();
-            packet.buildPacket(broadcast, source, message);
-            System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-            outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-            out = new ObjectOutputStream(outSocket.getOutputStream());
+            packet.buildPacket(source, message);
+            System.out.println("Server: Packet to be sent: " + packet + ", to: " + dest);
+            Socket outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
+            ObjectOutputStream out = new ObjectOutputStream(outSocket.getOutputStream());
             out.writeObject(packet);
             out.flush();
             out.close();
@@ -50,12 +51,10 @@ public class Server extends Thread {
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
 
-        //broadcast to every node
-        int messagesToSend = 5;
         try {
             boolean finished = false;
             server = new ServerSocket(serverPort);
-            System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
+            System.out.println("Server: Started at Host: " + serverHostname + " Port: " + serverPort);
 
             do {
                 System.out.println("Server: Waiting for a messages ...");
@@ -67,54 +66,57 @@ public class Server extends Thread {
                 in.close();
 
                 //get reqMsg, check if own application is in crit section, if not send key to requestor, if yes, add to queue and wait until cs_leave
-                if (//msg is reqmsg)
-                if (Main.isInCS) {
-                    //then add to queue and wait
-                } else {
-                    //send key back
-                }
+                if (packet.getMsg().equals(reqMsg)) {
+                    if (Main.isInCS) {
+                        //then add to queue and wait
+                        queue.add(packet);
+                        System.out.println("Server: Is in CS, Adding req to queue");
+                    } else if (Main.reqCS) {
+                        if (myRequest.getTime() > packet.getTime()) {
+                            //send key
+                            array_of_nodes[serverNum].addKeys(packet.getSourceId(), false);
+                            sendPacket(serverNum, sendKey, packet.getSourceId());
+                            Main.hasAllKeys = false;
+                            System.out.println("Server: not in cs, req later than other req, sending key to " + packet.getSourceId());
 
-                /*//get info out of msg
-                int broadcastSource = packet.getBroadcastNode();
-                int source = packet.getSourceId();
-                String msg = packet.getMsg();
-
-                //if record at broadcastSource == 0 then it means its a new message
-                if (!msg.equals(ackMsg)) {
-                    records[broadcastSource][0] = source;
-                    if (array_of_nodes[serverNum].getTreeNeighbours().size() == 1) {
-                        //send ack back to source if neighbour list is 1
-                        sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, source);
-                    } else {
-                        //continue broadcast message
-                        for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                            int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                            if (dest != source) {
-                                sendPacket(outSocket, out, broadcastSource, serverNum, msg, dest);
-                                records[broadcastSource][1] += 1;
-                            }
+                            //send req
+                            sendPacket(serverNum, reqMsg, packet.getSourceId());
+                            System.out.println("Server: Requesting key back from: " + packet.getSourceId());
+                        } else {
+                            queue.add(packet);
+                            System.out.println("Server: Own request earlier than new request, adding to queue");
                         }
+                    } else {
+                        //send key
+                        sendPacket(serverNum, sendKey, packet.getSourceId());
+                        array_of_nodes[serverNum].addKeys(packet.getSourceId(), false);
+                        Main.hasAllKeys = false;
+                        System.out.println("Server: not in cs, no req, sending requested key");
                     }
-                } else if (msg.equals(ackMsg)) {
-                    records[broadcastSource][1] -= 1;
-                    if (records[broadcastSource][1] == 0 && broadcastSource != serverNum) {
-                        //send ack since all replies recieved
-                        sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
-                        System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
-                    }
-                }*/
+                } else if (packet.getMsg().equals(sendKey)) {
+                    array_of_nodes[serverNum].addKeys(packet.getSourceId(), true);
+                    System.out.println("Server: We have recieved a key from " + packet.getSourceId());
+                }
             } while (!finished);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void addToQueue() {
+        Packet m = new Packet();
+        m.buildPacket(serverNum, reqMsg);
+        queue.add(m);
+        myRequest = m;
+        System.out.println("Server: Request added to queue");
+    }
+
     public synchronized boolean checkForKeys() {
         Nodes node = array_of_nodes[serverNum];
+        //System.out.println(node.getKeys());
         synchronized (node) {
             for (int i : node.getTreeNeighbours()) {
-                if (node.getKeys().get(i) == false) {
+                if (node.getKeys(i) == false) {
                     return false;
                 }
             }
@@ -124,21 +126,33 @@ public class Server extends Thread {
 
     public void getKeys() {
         //send msg to all servers with false key
+        System.out.println("Server: Requesting missing keys");
         Nodes node = array_of_nodes[serverNum];
         for (int i : node.getTreeNeighbours()) {
-            if (node.getKeys().get(i) == false) {
-                sendPacket(outSocket, out, serverNum, serverNum, reqMsg, i);
+            if (node.getKeys(i) == false) {
+                sendPacket(serverNum, reqMsg, i);
+                System.out.println("Server: From: " + i);
             }
         }
     }
 
-    public void addToQueue() {
-        Packet m = new Packet();
-        m.buildPacket(serverNum, serverNum, reqMsg);
-        queue.add(m);
+    public void removeFromQueue() {
+        for (Packet p : queue) {
+            if (p.getSourceId() != serverNum) {
+                array_of_nodes[serverNum].addKeys(p.getSourceId(), false);
+                sendPacket(serverNum, sendKey, p.getSourceId());
+                System.out.println("Server: Key has been sent to " + p.getSourceId());
+                queue.remove(p);
+                System.out.println("Server: Request from " + p.getSourceId() + " has been removed from queue.");
+            } else {
+                queue.remove(p);
+                myRequest = null;
+                System.out.println("Server: Own request has been removed from queue");
+            }
+        }
     }
 
-    public void removeFromQueue() {
-
+    public void printKeys() {
+        System.out.println(array_of_nodes[serverNum].getKeys());
     }
 }

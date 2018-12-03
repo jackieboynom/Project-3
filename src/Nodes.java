@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Nodes {
     private int nodeId;
@@ -8,9 +8,9 @@ public class Nodes {
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
     private ArrayList<Integer> treeNeighbours = new ArrayList<Integer>();
-    private HashMap<Integer, Boolean> keys = new HashMap<>();
-    private int interRequestDelay;
-    private int csExecutionTime;
+    private ConcurrentHashMap<Integer, Boolean> keys = new ConcurrentHashMap<>();
+    //private int interRequestDelay;
+    //private int csExecutionTime;
 
     public void setNodeId(int id) {
         this.nodeId = id;
@@ -36,16 +36,8 @@ public class Nodes {
         this.treeNeighbours.add(num);
     }
 
-    public void addKeysTrue(int num) {
-        this.keys.put(num, true);
-    }
-
-    public void addKeysFalse(int num) {
-        this.keys.put(num, false);
-    }
-
-    public void removeKeys(int num) {
-        this.keys.remove(num);
+    public void addKeys(int num, boolean status) {
+        this.keys.put(num, status);
     }
 
     public int getNodeId() {
@@ -72,11 +64,11 @@ public class Nodes {
         return this.treeNeighbours;
     }
 
-    public HashMap<Integer, Boolean> getKeys() {
+    public ConcurrentHashMap<Integer, Boolean> getKeys() {
         return this.keys;
     }
 
-    public int getInterRequestDelay() { return this.interRequestDelay; }
-
-    public int getCsExecutionTime() { return this.csExecutionTime; }
+    public boolean getKeys(int i) {
+        return this.keys.get(i);
+    }
 }
