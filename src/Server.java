@@ -33,11 +33,11 @@ public class Server extends Thread {
 
     public void initializeKeys() {
         //initilizate keys
-        for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-            if (array_of_nodes[serverNum].getTreeNeighbours().get(i) > serverNum) {
-                array_of_nodes[serverNum].addKeys(array_of_nodes[serverNum].getTreeNeighbours().get(i), true);
-            } else {
-                array_of_nodes[serverNum].addKeys(array_of_nodes[serverNum].getTreeNeighbours().get(i), false);
+        for (int i = 0; i < array_of_nodes.length; i++) {
+            if (i > serverNum) {
+                array_of_nodes[serverNum].addKeys(i, true);
+            } else if (i < serverNum) {
+                array_of_nodes[serverNum].addKeys(i, false);
             }
         }
         //printing keys
@@ -45,10 +45,10 @@ public class Server extends Thread {
         System.out.println("--------------------------KEYS DONE-----------------------------------");
     }
 
-    public void sendPacket(int source, String message, int dest) {
+    public void sendPacket(Packet packet, int dest) {
         try {
-            Packet packet = new Packet();
-            packet.buildPacket(source, message);
+            //Packet packet = new Packet();
+            //packet.buildPacket(source, message);
             System.out.println("Server: Packet to be sent: " + packet + ", to: " + dest);
             Socket outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
             ObjectOutputStream out = new ObjectOutputStream(outSocket.getOutputStream());
@@ -90,12 +90,14 @@ public class Server extends Thread {
                         if (myRequest.getTime() > packet.getTime()) {
                             //send key
                             array_of_nodes[serverNum].addKeys(packet.getSourceId(), false);
-                            sendPacket(serverNum, sendKey, packet.getSourceId());
+                            Packet pack = new Packet();
+                            pack.buildPacket(serverNum, sendKey);
+                            sendPacket(pack, packet.getSourceId());
                             Main.hasAllKeys = false;
                             System.out.println("Server: not in cs, req later than other req, sending key to " + packet.getSourceId());
 
                             //send req
-                            sendPacket(serverNum, reqMsg, packet.getSourceId());
+                            sendPacket(myRequest, packet.getSourceId());
                             System.out.println("Server: Requesting key back from: " + packet.getSourceId());
                         } else {
                             queue.add(packet);
@@ -103,7 +105,9 @@ public class Server extends Thread {
                         }
                     } else {
                         //send key
-                        sendPacket(serverNum, sendKey, packet.getSourceId());
+                        Packet pack = new Packet();
+                        pack.buildPacket(serverNum, sendKey);
+                        sendPacket(pack, packet.getSourceId());
                         array_of_nodes[serverNum].addKeys(packet.getSourceId(), false);
                         Main.hasAllKeys = false;
                         System.out.println("Server: not in cs, no req, sending requested key");
@@ -130,7 +134,7 @@ public class Server extends Thread {
         Nodes node = array_of_nodes[serverNum];
         //System.out.println(node.getKeys());
         synchronized (node) {
-            for (int i : node.getTreeNeighbours()) {
+            for (int i : node.getNodalConnections()) {
                 if (node.getKeys(i) == false) {
                     return false;
                 }
@@ -143,9 +147,9 @@ public class Server extends Thread {
         //send msg to all servers with false key
         System.out.println("Server: Requesting missing keys");
         Nodes node = array_of_nodes[serverNum];
-        for (int i : node.getTreeNeighbours()) {
+        for (int i : node.getNodalConnections()) {
             if (node.getKeys(i) == false) {
-                sendPacket(serverNum, reqMsg, i);
+                sendPacket(myRequest, i);
                 System.out.println("Server: From: " + i);
             }
         }
@@ -155,7 +159,9 @@ public class Server extends Thread {
         for (Packet p : queue) {
             if (p.getSourceId() != serverNum) {
                 array_of_nodes[serverNum].addKeys(p.getSourceId(), false);
-                sendPacket(serverNum, sendKey, p.getSourceId());
+                Packet pack = new Packet();
+                pack.buildPacket(serverNum, sendKey);
+                sendPacket(pack, p.getSourceId());
                 System.out.println("Server: Key has been sent to " + p.getSourceId());
                 queue.remove(p);
                 System.out.println("Server: Request from " + p.getSourceId() + " has been removed from queue.");

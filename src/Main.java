@@ -26,7 +26,7 @@ public class Main {
         String configPath = PATH + "/CS6378/Project-3/src/config_file.txt";
         Nodes[] array_of_nodes = Parser.parse(configPath);
 
-        //initilize variables
+        //initilize variables and logging file
         int delay = Parser.getD();
         int exTime = Parser.getC();
         int numOfRequest = Parser.getNumOfRequest();
@@ -34,8 +34,8 @@ public class Main {
         logPath = PATH + "/CS6378/Project-3/csTimes.log";
 
         //Start building spanning tree and initilize keys
-        SpanningTree tree = new SpanningTree(array_of_nodes, serverNum);
-        while(Thread.activeCount() > 1){ } //just waiting for spanning tree to finish
+        //SpanningTree tree = new SpanningTree(array_of_nodes, serverNum);
+        //while(Thread.activeCount() > 1){ } //just waiting for spanning tree to finish
 
         //start servers
         Server server = new Server(array_of_nodes, serverNum);
@@ -51,6 +51,7 @@ public class Main {
     }
 
     public Main() {
+        //initilize file
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
         } catch (Exception e) {
@@ -62,7 +63,7 @@ public class Main {
 
     public void start_app(Server server, int delay, int exTime, int numOfRequest) {
         for (int i = 0; i < numOfRequest; i++) {
-            System.out.println("Application: This is request #" + i);
+            System.out.println("Application: This is request #" + (i + 1));
             System.out.println("Application: This server is calling cs_enter()");
             cs_enter(server, exTime, delay);
             System.out.println("Application: This server is calling cs_leave()");
@@ -90,10 +91,8 @@ public class Main {
                 out.println();
                 out.close();
 
-                //start execution
+                //start execution and wait for exTime
                 System.out.println("Application: Executing...");
-
-                //wait for exTime
                 Thread.sleep(exTime);
                 System.out.println("Application: This server has finished executing cs");
             } catch (Exception e) {
@@ -111,7 +110,7 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //System.out.println("Application: waiting for keys"); //waiting
+            //System.out.println("Application: waiting for keys");
         }
         //do same stuff in the first if loop
         isInCS = true;
