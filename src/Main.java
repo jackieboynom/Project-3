@@ -33,10 +33,6 @@ public class Main {
         serverNum = Integer.parseInt(args[0]);
         logPath = PATH + "/CS6378/Project-3/csTimes.log";
 
-        //Start building spanning tree and initilize keys
-        //SpanningTree tree = new SpanningTree(array_of_nodes, serverNum);
-        //while(Thread.activeCount() > 1){ } //just waiting for spanning tree to finish
-
         //start servers
         Server server = new Server(array_of_nodes, serverNum);
         try {
