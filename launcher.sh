@@ -1,22 +1,22 @@
 #!/bin/bash
 
-konsole -e "scp -r ./src kxc170002@dc02.utdallas.edu:./CS6378/Project-3"
-konsole --noclose -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no kxc170002@dc02.utdallas.edu javac ./CS6378/Project-3/src/*.java"
-
 # Change this to your netid
 netid=kxc170002
 
 # Root directory of your project
-PROJDIR=./CS6378/Project-3/src
+PROJDIR=./CS6378/Project-3
 
 # Directory where the config file is located on your local system
 CONFIGLOCAL=./src/config_file.txt
 
 # Directory your java classes are in
-BINDIR=$PROJDIR
+BINDIR=$PROJDIR/src
 
 # Your main project class
 PROG=Main
+
+konsole -e "scp -r ./src $netid@dc42.utdallas.edu:./CS6378/Project-3"
+konsole --noclose -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $netid@dc42.utdallas.edu javac $BINDIR/*.java"
 
 n=0
 

@@ -3,13 +3,15 @@ Tanushri Singh (tts150030)
 Helee Thumber (hat170030)
 Ko-Chen (Jack) Chen (kxc170002)
 
+Make sure passwordsless login is set up
+and change netid in ./launcher.sh and ./cleanup.sh
+
 Instructions to compile and run:
-// Run the following lines of code on Terminal to set up your environment then to run
-1. cd IdeaProjects/Project-3/
-2. scp -r ./src tts150030@dc02.utdallas.edu:./CS6378/Project-3/
-3. ssh tts150030@dc02.utdallas.edu
-4. cd /CS6378/Project-3/src
-5. javac *.java
-6. exit
-7. ./launcher.sh
-8. ./cleanup.sh
+1. navigate to where you store Project-3
+2. ./launcher.sh
+3. ./cleanup.sh
+
+4. scp -r kxc170002@dc02.utdallas.edu:./CS6378/Project-3/csTimes.log ./
+5. java Test
+
+

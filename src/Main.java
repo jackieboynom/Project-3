@@ -74,6 +74,7 @@ public class Main {
                 e.printStackTrace();
             }
         }
+        System.out.println("WE ARE DONE!!!");
     }
 
     public void cs_enter(Server s, int exTime, int delay) {
@@ -87,7 +88,7 @@ public class Main {
                 //log time start
                 out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
                 out.println();
-                out.append(System.currentTimeMillis() + ":" + serverNum + "-Start");
+                out.append(System.currentTimeMillis() + ":::" + serverNum + "---Begin");
                 out.println();
                 out.close();
 
@@ -120,7 +121,7 @@ public class Main {
             //log time start
             out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
             out.println();
-            out.append(System.currentTimeMillis() + ":" + serverNum + "-Start");
+            out.append(System.currentTimeMillis() + ":::" + serverNum + "---Begin");
             out.println();
             out.close();
 
@@ -138,7 +139,7 @@ public class Main {
     public void cs_leave(Server s) {
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
-            out.append(System.currentTimeMillis() + ":" + serverNum + "-End");
+            out.append(System.currentTimeMillis() + ":::" + serverNum + "---Finish");
             out.println();
         } catch (Exception e) {
             e.printStackTrace();
