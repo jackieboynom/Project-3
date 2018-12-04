@@ -16,6 +16,7 @@ public class Main {
     static volatile boolean hasAllKeys = false;
     public static int serverNum = 0;
     public static String PATH = System.getProperty("user.dir");
+    double avgMsgComp = 0.0;
 
     PrintWriter out;
     public static String logPath;
@@ -70,9 +71,11 @@ public class Main {
             }
         }
         System.out.println("WE ARE DONE!!!");
+        System.out.println("Average message complexity: " + avgMsgComp / numOfRequest);
     }
 
     public void cs_enter(Server s, int exTime, int delay) {
+        s.messageCompCounter = 0;
         s.addToQueue();
         reqCS = true;
         if (s.checkForKeys()) {
@@ -80,17 +83,26 @@ public class Main {
             hasAllKeys = true;
             System.out.println("Application: This server has all the keys");
             try {
-                //log time start
+                //log request time
                 out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
                 out.println();
+                out.append(s.myRequest.getTime() + ":::" + serverNum + "---Request");
+                out.println();
+                out.close();
+
+                //log time start
+                out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
                 out.append(System.currentTimeMillis() + ":::" + serverNum + "---Begin");
                 out.println();
                 out.close();
 
-                //start execution and wait for exTime
+                //start execution
                 System.out.println("Application: Executing...");
+
+                //wait for exTime
                 Thread.sleep(exTime);
                 System.out.println("Application: This server has finished executing cs");
+                avgMsgComp = avgMsgComp + s.messageCompCounter;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -113,9 +125,15 @@ public class Main {
         hasAllKeys = true;
         System.out.println("Application: This server has all the keys");
         try {
-            //log time start
+            //log request time
             out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
             out.println();
+            out.append(s.myRequest.getTime() + ":::" + serverNum + "---Request");
+            out.println();
+            out.close();
+
+            //log time start
+            out = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
             out.append(System.currentTimeMillis() + ":::" + serverNum + "---Begin");
             out.println();
             out.close();
@@ -126,6 +144,7 @@ public class Main {
             //wait for exTime
             Thread.sleep(exTime);
             System.out.println("Application: This server has finished executing cs");
+            avgMsgComp = avgMsgComp + s.messageCompCounter;
         } catch (Exception e) {
             e.printStackTrace();
         }

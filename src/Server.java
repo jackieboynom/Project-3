@@ -2,14 +2,15 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
-import java.util.Queue;
+import java.util.*;
 
 public class Server extends Thread {
     //set up variables
     private Nodes[] array_of_nodes;
     private int serverNum;
     private Queue<Packet> queue;
-    private Packet myRequest = null;
+    Packet myRequest = null;
+    int messageCompCounter = 0;
 
     //Set up messages
     String reqMsg = "REQ"; //requesting cs section
@@ -93,11 +94,13 @@ public class Server extends Thread {
                             Packet pack = new Packet();
                             pack.buildPacket(serverNum, sendKey);
                             sendPacket(pack, packet.getSourceId());
+                            messageCompCounter++;
                             Main.hasAllKeys = false;
                             System.out.println("Server: not in cs, req later than other req, sending key to " + packet.getSourceId());
 
                             //send req
                             sendPacket(myRequest, packet.getSourceId());
+                            messageCompCounter++;
                             System.out.println("Server: Requesting key back from: " + packet.getSourceId());
                         } else {
                             queue.add(packet);
@@ -108,6 +111,7 @@ public class Server extends Thread {
                         Packet pack = new Packet();
                         pack.buildPacket(serverNum, sendKey);
                         sendPacket(pack, packet.getSourceId());
+                        messageCompCounter++;
                         array_of_nodes[serverNum].addKeys(packet.getSourceId(), false);
                         Main.hasAllKeys = false;
                         System.out.println("Server: not in cs, no req, sending requested key");
@@ -150,6 +154,7 @@ public class Server extends Thread {
         for (int i : node.getNodalConnections()) {
             if (node.getKeys(i) == false) {
                 sendPacket(myRequest, i);
+                messageCompCounter++;
                 System.out.println("Server: From: " + i);
             }
         }
@@ -162,6 +167,7 @@ public class Server extends Thread {
                 Packet pack = new Packet();
                 pack.buildPacket(serverNum, sendKey);
                 sendPacket(pack, p.getSourceId());
+                messageCompCounter++;
                 System.out.println("Server: Key has been sent to " + p.getSourceId());
                 queue.remove(p);
                 System.out.println("Server: Request from " + p.getSourceId() + " has been removed from queue.");
