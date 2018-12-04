@@ -24,7 +24,7 @@ public class Test {
 			for (String value : values.values()) {
 				String[] line;
 				if (oldValue != null && counter % 2 == 0) {
-					line = value.split("-");
+					line = value.split("---");
 					String[] previousLine = oldValue.split("---");
 					if (previousLine[0].equals(line[0])) {
 						if (previousLine[1].equalsIgnoreCase("Begin") && line[1].equalsIgnoreCase("Finish")) {
